@@ -112,4 +112,83 @@ export default function App() {
         <div className="max-w-2xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <div className="text-sm font-bold text-blue-600 uppercase">Nivel {currentLevel} de 2</div>
-            <div className="flex items-
+            <div className="flex items-center gap-2">
+              <Timer size="{20}"/> <span className="font-mono">Sesión Iniciada</span>
+            </div>
+          </div>
+
+          {QUESTIONS.filter(q => q.level === currentLevel).map((q) => (
+            <div key={q.id} className="bg-white p-6 rounded-xl shadow-lg border border-slate-200 mb-6">
+              <h3 className="font-bold mb-4">{q.text}</h3>
+              <div className="space-y-2">
+                {q.options.map((opt, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => handleAnswer(q.id, i)}
+                    className={`w-full text-left p-3 rounded-lg border transition ${
+                      answers[q.id] === i ? 'bg-blue-50 border-blue-500 font-medium' : 'hover:bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+              <button 
+                onClick={() => toggleExpertNote(q.id)} 
+                className="mt-4 text-sm text-blue-600 flex items-center gap-2 underline"
+              >
+                <HelpCircle size="{16}"/> 
+                {showExpertNotes[q.id] ? 'Ocultar Nota de Experto' : 'Ver Nota de Experto'}
+              </button>
+              {showExpertNotes[q.id] && (
+                <p className="mt-2 p-3 bg-amber-50 text-amber-800 rounded-lg text-sm italic border border-amber-200">
+                  {q.expertNote}
+                </p>
+              )}
+            </div>
+          ))}
+
+          <button 
+            onClick={() => currentLevel === 1 ? setCurrentLevel(2) : calculateResults()}
+            className="w-full bg-slate-900 text-white p-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition"
+          >
+            {currentLevel === 1 ? 'Pasar a Nivel 2 (Negociación)' : 'Finalizar Evaluación'} <ChevronRight size="{20}"/>
+          </button>
+        </div>
+      )}
+
+      {screen === 'report' && results && (
+        <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-2xl print:shadow-none" id="report">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-slate-900">Reporte de Desempeño</h2>
+            <p className="text-slate-500">{userData.name} - {userData.store}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="p-4 bg-slate-100 rounded-xl">
+              <p className="text-sm text-slate-600">Nivel 1 (Procedimiento)</p>
+              <p className="text-2xl font-bold">{results.level1}/10 pts</p>
+            </div>
+            <div className="p-4 bg-slate-100 rounded-xl">
+              <p className="text-sm text-slate-600">Nivel 2 (Negociación)</p>
+              <p className="text-2xl font-bold">{results.level2}/10 pts</p>
+            </div>
+          </div>
+          <div className="text-center py-6 border-y mb-8">
+            <p className="text-5xl font-black text-blue-600">{results.total}/20</p>
+            <p className="font-bold mt-2 text-xl">
+              {results.total >= 14 ? '¡Logrado con Éxito!' : 'En Proceso de Mejora'}
+            </p>
+          </div>
+          <div className="flex gap-4 print:hidden">
+            <button onClick={() => window.print()} className="flex-1 border-2 border-slate-300 p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-50 transition">
+              <Printer size="{20}"/> Imprimir
+            </button>
+            <button onClick={() => window.location.reload()} className="flex-1 bg-blue-600 text-white p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition font-bold">
+              <RefreshCw size="{20}"/> Reiniciar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
